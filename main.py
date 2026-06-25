@@ -1,5 +1,5 @@
 number1 = 50
-number2 = 10
+number2 = 70
 
 result = number1 + number2
 result2 = number1 * number2
