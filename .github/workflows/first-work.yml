@@ -1,11 +1,8 @@
 name: Run Python code script
 
 on:
-  push:
-    branches:
-      - 'main'
-    paths:
-      - '**.py'
+  pull_request:
+    types: [opened, reopened]
 jobs:
   execute-python:
     runs-on: ubuntu-latest
