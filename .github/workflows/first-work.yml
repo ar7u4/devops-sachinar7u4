@@ -1,8 +1,9 @@
 name: Run Python code script
 
 on:
-  push: 
-    branches: [ main ]
+  push:
+    paths:
+      - '**.py'
 jobs:
   execute-python:
     runs-on: ubuntu-latest
