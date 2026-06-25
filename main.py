@@ -1,4 +1,4 @@
-number1 = 5
+number1 = 50
 number2 = 10
 
 result = number1 + number2
