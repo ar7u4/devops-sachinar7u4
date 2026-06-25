@@ -3,6 +3,9 @@ name: Run Python code script
 on:
   pull_request:
     types: [opened, reopened]
+
+  workflow_dispatch:
+
 jobs:
   execute-python:
     runs-on: ubuntu-latest
