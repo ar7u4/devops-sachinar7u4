@@ -1,0 +1,23 @@
+name: Run Python code script
+
+on:
+  push: 
+    branches: [ main ]
+jobs:
+  execute-python:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name : steps 1 - checkoutcode background
+        uses: actions/checkout@v4
+
+      # - name: steps 2 - set up python
+      #   uses: actions/set-python@v5
+      #   with:
+      #     python-version: '3.11'
+
+      - name: step 3 execute code
+        run: python main.py
+  
+  
+  
