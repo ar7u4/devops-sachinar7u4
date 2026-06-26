@@ -10,8 +10,8 @@ jobs:
     steps:
       - name: Deploying to Production Server
         env:
-          # API_KEY: ${{ secrets.PRODUCTION_API_KEY }} # Pulled securely from GitHub Secrets
-          API_KEY: 13456 # Pulled securely from GitHub Secrets
+          API_KEY: ${{ secrets.PRODUCTION_API_KEY }} # Pulled securely from GitHub Secrets
+          # API_KEY: 13456 # Pulled securely from GitHub Secrets
         run: |
           echo "Connecting to production server..."
           # GitHub will automatically mask secrets in logs (e.g., ***)
