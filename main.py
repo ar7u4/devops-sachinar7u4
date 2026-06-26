@@ -15,7 +15,7 @@ def subtract(a: int, b: int) -> int:
 
 if __name__ == "__main__":
     number1 = 50
-    number2 = 10
+    number2 = 100
 
     result = add(number1, number2)
     result2 = multiply(number1, number2)
