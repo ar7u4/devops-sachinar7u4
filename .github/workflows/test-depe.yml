@@ -1,0 +1,21 @@
+name: 09-Conditionals
+on: [push]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build Application
+        run: echo "Building app2..."
+
+      - name: Deploy to Prod (Main Branch Only)
+        if: github.ref == 'refs/heads/main'
+        run: echo "Deploying to live production server!"
+        
+      - name: Deploy to Prod (test Branch Only)
+        if: github.ref == 'refs/heads/test'
+        run: echo "Deploying to live test server!"
+
+      - name: Notify Slack on Failure
+        if: failure() # Special function that runs only if a previous step failed
+        run: echo "Something went wrong during the build process."
