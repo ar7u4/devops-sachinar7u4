@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Build Application
-        run: echo "Building app..."
+        run: echo "Building app2..."
 
       - name: Deploy to Prod (Main Branch Only)
         if: github.ref == 'refs/heads/main'
