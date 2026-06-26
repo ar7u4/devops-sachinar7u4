@@ -1,20 +1,20 @@
-name: 05-Job-Dependencies
+name: 06-Matrix-Testing
 on: [push]
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - run: ech "Running Code Linter..."
+  test-grid:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node-version: [18, 20, 22]
+    runs-on: ${{ matrix.os }}
 
-  build:
-    runs-on: ubuntu-latest
-    needs: lint # This job won't start until 'lint' succeeds
     steps:
-      - run: echo "Compiling Code..."
-
-  test:
-    runs-on: ubuntu-latest
-    needs: build # This job won't start until 'build' succeeds
-    steps:
-      - run: echo "Running Integration Tests..."
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Run Tests
+        run: echo "Testing on ${{ matrix.os }} with Node ${{ matrix.node-version }}"
