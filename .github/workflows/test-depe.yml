@@ -19,11 +19,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-assets
     steps:
-      - name: Download Build Folder
-        uses: actions/download-artifact@v4
-        with:
-          name: production-build
-          path: ready-to-deploy/
+      # - name: Download Build Folder
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: production-build
+      #     path: ready-to-deploy/
 
       - name: Verify Files
         run: ls -la ready-to-deploy/
