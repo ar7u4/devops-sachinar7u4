@@ -1,66 +1,50 @@
-name: Job Status Conditionals Demo
+# .github/workflows/conditional-deps.yml
+# Jobs with conditional execution based on dependency status
+name: Conditional Dependencies
 
-on:
-  push:
-    branches:
-      - 'main'
-  workflow_dispatch: # Allows manual trigger from GitHub UI for interactive teaching
+on: push
 
 jobs:
-  conditionals-demo:
+  build:
     runs-on: ubuntu-latest
-    name: Showcase Job Status Functions
-
     steps:
-      - name: Step 1 - Normal Success Step
-        run: |
-          echo "This step runs successfully."
-          echo "By default, GitHub steps run under the implicit check: if: success()"
+      - run: npm run build
 
-      - name: Step 2 - Explicit success() Check
-        if: ${{ success() }}
-        run: |
-          echo "This step executes because the previous step succeeded."
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - run: npm test
 
-      - name: Step 3 - Soft Failure (continue-on-error)
-        id: soft-fail
-        continue-on-error: true
+  # Always notify, regardless of success or failure
+  notify:
+    needs: [build, test]
+    # Run even if previous jobs failed
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send notification
         run: |
-          echo "This step fails with exit code 1, but continue-on-error is set to true!"
-          exit 1
+          if [ "${{ needs.build.result }}" == "success" ] && [ "${{ needs.test.result }}" == "success" ]; then
+            echo "Pipeline succeeded!"
+          else
+            echo "Pipeline failed!"
+          fi
 
-      - name: Step 4 - Run after Soft-Failure
-        if: ${{ success() }}
-        run: |
-          echo "This step STILL runs under success()!"
-          echo "Why? Because continue-on-error: true prevents the job status from switching to failure."
+  # Only run cleanup if something failed
+  cleanup-on-failure:
+    needs: [build, test]
+    # Run only if any previous job failed
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Cleaning up after failure..."
 
-      - name: Step 5 - Hard Failure Step
-        id: hard-fail
-        run: |
-          echo "This step fails with exit code 1 and has no continue-on-error handler."
-          echo "It will set the overall job status to 'failed'."
-          exit 1
-
-      - name: Step 6 - Run on failure() Only
-        if: ${{ failure() }}
-        run: |
-          echo "========================================="
-          echo "🚨 FAILURE HANDLER DETECTED!"
-          echo "This step ran because a previous step failed (Step 5)."
-          echo "This is typically used for sending Slack/Teams alerts, uploading error logs, or triggering rollbacks."
-          echo "========================================="
-
-      - name: Step 7 - Skipped on Failure
-        if: ${{ success() }}
-        run: |
-          echo "This step will be SKIPPED because the job status is currently failed."
-
-      - name: Step 8 - Run always() Cleanup
-        if: ${{ always() }}
-        run: |
-          echo "========================================="
-          echo "🧹 ALWAYS CLEANUP DETECTED!"
-          echo "This step runs regardless of success, failure, or cancellation."
-          echo "This is perfect for exporting test reports, tearing down staging servers, or cleaning up workspaces."
-          echo "========================================="
+  # Deploy only if all tests passed
+  deploy:
+    needs: [build, test]
+    # Run only if all previous jobs succeeded (default behavior made explicit)
+    if: success()
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Deploying..."
