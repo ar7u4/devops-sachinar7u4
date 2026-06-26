@@ -5,7 +5,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Running Code Linter..."
+      - run: ech "Running Code Linter..."
 
   build:
     runs-on: ubuntu-latest
