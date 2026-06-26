@@ -1,0 +1,66 @@
+name: Job Status Conditionals Demo
+
+on:
+  push:
+    branches:
+      - 'main'
+  workflow_dispatch: # Allows manual trigger from GitHub UI for interactive teaching
+
+jobs:
+  conditionals-demo:
+    runs-on: ubuntu-latest
+    name: Showcase Job Status Functions
+
+    steps:
+      - name: Step 1 - Normal Success Step
+        run: |
+          echo "This step runs successfully."
+          echo "By default, GitHub steps run under the implicit check: if: success()"
+
+      - name: Step 2 - Explicit success() Check
+        if: ${{ success() }}
+        run: |
+          echo "This step executes because the previous step succeeded."
+
+      - name: Step 3 - Soft Failure (continue-on-error)
+        id: soft-fail
+        continue-on-error: true
+        run: |
+          echo "This step fails with exit code 1, but continue-on-error is set to true!"
+          exit 1
+
+      - name: Step 4 - Run after Soft-Failure
+        if: ${{ success() }}
+        run: |
+          echo "This step STILL runs under success()!"
+          echo "Why? Because continue-on-error: true prevents the job status from switching to failure."
+
+      - name: Step 5 - Hard Failure Step
+        id: hard-fail
+        run: |
+          echo "This step fails with exit code 1 and has no continue-on-error handler."
+          echo "It will set the overall job status to 'failed'."
+          exit 1
+
+      - name: Step 6 - Run on failure() Only
+        if: ${{ failure() }}
+        run: |
+          echo "========================================="
+          echo "🚨 FAILURE HANDLER DETECTED!"
+          echo "This step ran because a previous step failed (Step 5)."
+          echo "This is typically used for sending Slack/Teams alerts, uploading error logs, or triggering rollbacks."
+          echo "========================================="
+
+      - name: Step 7 - Skipped on Failure
+        if: ${{ success() }}
+        run: |
+          echo "This step will be SKIPPED because the job status is currently failed."
+
+      - name: Step 8 - Run always() Cleanup
+        if: ${{ always() }}
+        run: |
+          echo "========================================="
+          echo "🧹 ALWAYS CLEANUP DETECTED!"
+          echo "This step runs regardless of success, failure, or cancellation."
+          echo "This is perfect for exporting test reports, tearing down staging servers, or cleaning up workspaces."
+          echo "========================================="
