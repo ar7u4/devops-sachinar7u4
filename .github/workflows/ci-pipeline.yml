@@ -1,0 +1,36 @@
+name: Python Continuous Integration Pipeline
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    branches:
+      - 'main'
+
+jobs:
+  run-qa:
+    runs-on: ubuntu-latest
+    name: Run Linting and Tests via Composite Action
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Run Python QA Composite Action
+        id: qa-steps
+        uses: ./.github/actions/python-qa
+        with:
+          python-version: '3.11'
+          run-lint: 'true'
+          run-tests: 'true'
+
+      # Showcase how to consume the outputs returned by the composite action
+      - name: Display Composite Action Outputs
+        run: |
+          echo "========================================="
+          echo "Pipeline summary from Composite Action:"
+          echo "Linting Status: ${{ steps.qa-steps.outputs.lint-status }}"
+          echo "Testing Status: ${{ steps.qa-steps.outputs.test-status }}"
+          echo "========================================="
+        shell: bash

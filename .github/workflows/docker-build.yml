@@ -1,0 +1,72 @@
+name: Docker Build and Tag Pipeline
+
+on:
+  push:
+    branches:
+      - 'main'
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+
+jobs:
+  build-image:
+    runs-on: ubuntu-latest
+    name: Build and Tag Docker Image
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Setup QEMU for multi-platform support (e.g. build for amd64/arm64)
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      # Setup Docker Buildx (replaces default docker build tool, enables caching, buildx tags)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # -----------------------------------------------------------------
+      # FUTURE SESSION: Docker Registry Authentication (Commented Out)
+      # -----------------------------------------------------------------
+      # - name: Log in to Docker Hub
+      #   uses: docker/login-action@v3
+      #   with:
+      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Extract metadata (tags, labels) to automate tagging rules
+      - name: Extract Docker Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: my-python-app
+          tags: |
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            type=ref,event=branch
+            type=ref,event=tag
+            type=sha,format=short
+
+      # Build the Docker image locally and assign generated tags
+      - name: Build Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false # set to true in future part when login credentials are configured
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      # -----------------------------------------------------------------
+      # FUTURE SESSION: Image Push Log (Commented Out push step show-case)
+      # -----------------------------------------------------------------
+      - name: Image Build Verification Log
+        run: |
+          echo "=================================================="
+          echo " Docker image successfully built and tagged locally!"
+          echo " Generated Tags:"
+          echo "${{ steps.meta.outputs.tags }}"
+          echo "--------------------------------------------------"
+          echo " Note: Docker Push step is currently disabled."
+          echo " In the future part, we will enable 'push: true' and configure credentials."
+          echo "=================================================="
+        shell: bash
