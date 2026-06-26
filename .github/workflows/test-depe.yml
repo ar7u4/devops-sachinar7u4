@@ -12,7 +12,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: echo "Deploying to live production server!"
         
-      - name: Deploy to Prod (Main Branch Only)
+      - name: Deploy to Prod (test Branch Only)
         if: github.ref == 'refs/heads/test'
         run: echo "Deploying to live test server!"
 
