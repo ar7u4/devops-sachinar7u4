@@ -1,18 +1,21 @@
-name: 08-Secrets-And-Environments
-on:
-  workflow_dispatch: # Best tested manually
+name: 09-Conditionals
+on: [push]
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    environment: Production # Links this job to a specific GitHub Environment
-
     steps:
-      - name: Deploying to Production Server
-        env:
-          API_KEY: ${{ secrets.PRODUCTION_API_KEY }} # Pulled securely from GitHub Secrets
-          # API_KEY: 13456 # Pulled securely from GitHub Secrets
-        run: |
-          echo "Connecting to production server..."
-          # GitHub will automatically mask secrets in logs (e.g., ***)
-          echo "Using API Key: $API_KEY"
+      - name: Build Application
+        run: echo "Building app..."
+
+      - name: Deploy to Prod (Main Branch Only)
+        if: github.ref == 'refs/heads/main'
+        run: echo "Deploying to live production server!"
+        
+      - name: Deploy to Prod (Main Branch Only)
+        if: github.ref == 'refs/heads/test'
+        run: echo "Deploying to live test server!"
+
+      - name: Notify Slack on Failure
+        if: failure() # Special function that runs only if a previous step failed
+        run: echo "Something went wrong during the build process."
